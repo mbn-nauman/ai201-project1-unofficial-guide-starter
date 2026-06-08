@@ -112,6 +112,16 @@ Generation → GrokAPI: llama-3.3-70b-versatile, citations must be added in the 
      "I'll give Claude my Chunking Strategy section and ask it to implement chunk_text()
      with my specified chunk size and overlap" is a plan. -->
 
+Document Injestion: I will use Claude to help with the document injestion. I will give it the source list, domain and the project requirement that documents must be loaded cleaned and prepared for chunking. I want to get a simple Python structure which will help me save the title, url and the cleaned text. I will verify the cleaned text by printing it to make sure no random ads or other unimportant things are added to it. 
+
+Chunkiung: I will give claude my chunking strategy section and ask it to implement a chunking function.
+
+Embedding: I will tell claude that we will use the all-MiniLM-L6-v2 model via sentence-transformers
+
+Retreival: I will ask claude to see my retrieval approach section and see the tradeoff and also the top-k = 4.
+
+Generation: I will ask claude to implement GrokAPI: llama-3.3-70b-versatile for the answer/output generation. I will also tell it to make sure to add citation to every answer and in any case when there is no answer, then just tell the user "The answer to your question is not in our database."
+
 **Milestone 3 — Ingestion and chunking:**
 
 **Milestone 4 — Embedding and retrieval:**
