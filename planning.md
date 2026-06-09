@@ -119,4 +119,6 @@ Retreival: I will ask claude to see my retrieval approach section and see the tr
 
 Generation: I will ask claude to implement GrokAPI: llama-3.3-70b-versatile for the answer/output generation. I will also tell it to make sure to add citation to every answer and in any case when there is no answer, then just tell the user "The answer to your question is not in our database."
 
-Interface: Make it a simple question box and answer box where user can enter question and answer can be generated and we can work on making the interface better later
+(Claude Ai was used to write the Interface planning part -- I initally used Gradio but that was too simple and I was unable to add the Crimson Red Haverford College Logo color with it so I shfted to StreamLit)
+
+Interface: Build a chat-style interface using Streamlit with st.chat_message and st.chat_input so the UI looks like a real AI assistant. Use a .streamlit/config.toml to apply Haverford's black and crimson color scheme. Sources for each answer will appear in a collapsible expander below the assistant's message. Chat history is preserved in st.session_state for the duration of the session. 

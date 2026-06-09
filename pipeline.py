@@ -1,6 +1,10 @@
 import os
 import chromadb
 from sentence_transformers import SentenceTransformer
+from groq import Groq
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DOCUMENTS_DIR = "documents"
 CHROMA_DIR = "chroma_db"
@@ -147,6 +151,51 @@ def retrieve(query, top_k=4):
         })
     chunks.sort(key=lambda c: c["distance"])
     return chunks
+
+
+def generate(query, top_k=4):
+    chunks = retrieve(query, top_k=top_k)
+
+    context_blocks = []
+    for i, chunk in enumerate(chunks):
+        context_blocks.append(
+            f"[Source {i+1}]\n"
+            f"Title: {chunk['title']}\n"
+            f"URL: {chunk['url']}\n"
+            f"Content: {chunk['text']}"
+        )
+    context = "\n\n".join(context_blocks)
+
+    system_prompt = (
+        "You are a helpful assistant for Haverford College incoming first-years. "
+        "Answer the user's question using ONLY the provided source chunks below. "
+        "Do not use any outside knowledge. "
+        "If the chunks do not contain enough information to answer the question, "
+        'respond with exactly: "The answer to your question is not in our database."'
+    )
+
+    user_prompt = f"Sources:\n\n{context}\n\nQuestion: {query}"
+
+    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+    )
+
+    answer = response.choices[0].message.content
+
+    seen = set()
+    sources = []
+    for chunk in chunks:
+        key = chunk["url"]
+        if key not in seen:
+            seen.add(key)
+            sources.append(f"{chunk['title']} — {chunk['url']}")
+
+    return {"answer": answer, "sources": sources}
 
 
 if __name__ == "__main__":
