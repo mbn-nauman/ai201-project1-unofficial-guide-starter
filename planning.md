@@ -113,11 +113,11 @@ Chunkiung: I will give claude my chunking strategy section and ask it to impleme
 
 Embedding: I will tell claude that we will use the all-MiniLM-L6-v2 model via sentence-transformers
 
-Retreival: I will ask claude to see my retrieval approach section and see the tradeoff and also the top-k = 4.
+Retreival: I will ask claude to see my retrieval approach section and see the tradeoff and also the top-k = 4. I will also be using a limit on the maximum distance on the top chunk which would be 0.7. If it is more than 0.7 then just say the default no answer sentence. If the top chunk is less than 0.7, then send chunks to the LLM for answer generation.
 
 **Milestone 5 — Generation and interface:**
 
-Generation: I will ask claude to implement GrokAPI: llama-3.3-70b-versatile for the answer/output generation. I will also tell it to make sure to add citation to every answer and in any case when there is no answer, then just tell the user "The answer to your question is not in our database."
+Generation: I will ask claude to implement GrokAPI: llama-3.3-70b-versatile for the answer/output generation. I will also tell it to make sure to add citation to every answer and in any case when there is no answer, then just tell the user "The answer to your question is not in our database." 
 
 (Claude Ai was used to write the Interface planning part -- I initally used Gradio but that was too simple and I was unable to add the Crimson Red Haverford College Logo color with it so I shfted to StreamLit)
 
