@@ -1,6 +1,32 @@
 import os
+import chromadb
+from sentence_transformers import SentenceTransformer
 
 DOCUMENTS_DIR = "documents"
+CHROMA_DIR = "chroma_db"
+COLLECTION_NAME = "haverford_guide"
+
+_model = None
+_collection = None
+
+
+def get_model():
+    global _model
+    if _model is None:
+        print("Loading embedding model...")
+        _model = SentenceTransformer("all-MiniLM-L6-v2")
+    return _model
+
+
+def get_collection():
+    global _collection
+    if _collection is None:
+        client = chromadb.PersistentClient(path=CHROMA_DIR)
+        _collection = client.get_or_create_collection(
+            name=COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"},
+        )
+    return _collection
 
 # Maps filename → (title, url)
 DOCUMENT_METADATA = {
@@ -57,12 +83,13 @@ def load_documents():
     return documents
 
 
-def chunk_text(text, chunk_size=700, overlap=100):
+def chunk_text(text, chunk_size=500, overlap=100):
     chunks = []
     start = 0
     while start < len(text):
         end = start + chunk_size
-        chunks.append(text[start:end])
+        line_number = text[:start].count("\n") + 1
+        chunks.append({"text": text[start:end], "line_number": line_number})
         start += chunk_size - overlap
     return chunks
 
@@ -70,14 +97,56 @@ def chunk_text(text, chunk_size=700, overlap=100):
 def build_chunks(documents):
     all_chunks = []
     for doc in documents:
-        text_chunks = chunk_text(doc["text"])
-        for chunk in text_chunks:
+        for chunk in chunk_text(doc["text"]):
             all_chunks.append({
                 "title": doc["title"],
                 "url": doc["url"],
-                "text": chunk,
+                "text": chunk["text"],
+                "line_number": chunk["line_number"],
             })
     return all_chunks
+
+
+def embed_and_store(chunks):
+    model = get_model()
+    collection = get_collection()
+
+    # Skip if already populated
+    if collection.count() > 0:
+        print(f"Collection already has {collection.count()} chunks — skipping embedding.")
+        return
+
+    texts = [c["text"] for c in chunks]
+    print(f"Embedding {len(texts)} chunks...")
+    embeddings = model.encode(texts, show_progress_bar=True).tolist()
+
+    collection.add(
+        ids=[str(i) for i in range(len(chunks))],
+        embeddings=embeddings,
+        documents=texts,
+        metadatas=[{"title": c["title"], "url": c["url"], "line_number": c["line_number"]} for c in chunks],
+    )
+    print(f"Stored {len(chunks)} chunks in ChromaDB.\n")
+
+
+def retrieve(query, top_k=4):
+    model = get_model()
+    collection = get_collection()
+
+    query_embedding = model.encode([query]).tolist()
+    results = collection.query(query_embeddings=query_embedding, n_results=top_k)
+
+    chunks = []
+    for i in range(len(results["documents"][0])):
+        chunks.append({
+            "distance": results["distances"][0][i],
+            "text": results["documents"][0][i],
+            "title": results["metadatas"][0][i]["title"],
+            "url": results["metadatas"][0][i]["url"],
+            "line_number": results["metadatas"][0][i]["line_number"],
+        })
+    chunks.sort(key=lambda c: c["distance"])
+    return chunks
 
 
 if __name__ == "__main__":
@@ -87,11 +156,14 @@ if __name__ == "__main__":
     all_chunks = build_chunks(documents)
     print(f"Total chunks: {len(all_chunks)}\n")
 
-    print("--- 5 sample chunks ---\n")
-    step = max(1, len(all_chunks) // 5)
-    for i in range(0, min(5 * step, len(all_chunks)), step):
-        chunk = all_chunks[i]
-        print(f"[Chunk {i}] Source: {chunk['title']}")
-        print(f"URL: {chunk['url']}")
-        print(f"Text: {chunk['text'][:300]}...")
+    embed_and_store(all_chunks)
+
+    # Test retrieval
+    test_query = "What are the freshman dorms like?"
+    print(f"Test query: '{test_query}'\n")
+    results = retrieve(test_query)
+    for i, r in enumerate(results):
+        print(f"[Result {i+1}] {r['title']}")
+        print(f"URL: {r['url']}")
+        print(f"Text: {r['text'][:300]}...")
         print()
