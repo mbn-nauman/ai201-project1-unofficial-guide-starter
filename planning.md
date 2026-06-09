@@ -20,7 +20,7 @@ Haverford College incoming first-year survival guide. This information is genera
 | 2 | Reddit | Social Scene at Haverford | https://www.reddit.com/r/Haverford/comments/ti98st/social_scene_at_haverford/ |
 | 3 | Reddit | Reddit thread for QnA about Haverford | https://www.reddit.com/r/Haverford/comments/7ngl51/anyone_who_is_applying_have_questions_about/ |
 | 4 | Reddit | Another advice/QnA thread | https://www.reddit.com/r/Haverford/comments/1bfvbeg/class_of_27_28/ |
-| 5 | Reddit | A freshman guide to Haverford College | https://generalintelligences.wordpress.com/2020/05/16/a-freshman-guide-to-haverford-college/ |
+| 5 | WordPress | A freshman guide to Haverford College | https://generalintelligences.wordpress.com/2020/05/16/a-freshman-guide-to-haverford-college/ |
 | 6 | The Clerk | Freshman reflection on first month of Haverford College | https://haverfordclerk.com/freshmen-reflect-on-the-first-month-of-college/ |
 | 7 | The Clerk | A first-year's experience about Customs (Orientation) | https://haverfordclerk.com/customs-gave-me-a-community-a-first-year-perspective/ |
 | 8 | The Clerk | Dining Culture at Haverford according to a Transfer Student | https://haverfordclerk.com/handle-with-care-is-our-dining-center-culture-healthy/ |
@@ -37,9 +37,9 @@ Haverford College incoming first-year survival guide. This information is genera
      A review-heavy corpus warrants different chunking than a long FAQ. -->
 
 **Chunk size:**
-1000
+1000 characters
 **Overlap:**
-200
+200 characters
 **Reasoning:**
 As my documents include reddit comments, student reviews etc, I chose a chunk size of 1000 and overlap of 200 so that it is big enough to extract the student's experience and small enough to preserve the context. 
 
@@ -102,28 +102,21 @@ Generation → GrokAPI: llama-3.3-70b-versatile, citations must be added in the 
 
 ## AI Tool Plan
 
-<!-- For each part of the pipeline below, describe:
-     - Which AI tool you plan to use (Claude, Copilot, ChatGPT, etc.)
-     - What you'll give it as input (which sections of this planning.md, which requirements)
-     - What you expect it to produce
-     - How you'll verify the output matches your spec
 
-     "I'll use AI to help me code" is not a plan.
-     "I'll give Claude my Chunking Strategy section and ask it to implement chunk_text()
-     with my specified chunk size and overlap" is a plan. -->
+**Milestone 3 — Ingestion and chunking:**
 
-Document Injestion: I will use Claude to help with the document injestion. I will give it the source list, domain and the project requirement that documents must be loaded cleaned and prepared for chunking. I want to get a simple Python structure which will help me save the title, url and the cleaned text. I will verify the cleaned text by printing it to make sure no random ads or other unimportant things are added to it. 
+Document Injestion: I will use Claude to help with the document injestion. I will clean all the documents manually which I can, and ask ChatGPT to help me with any which I cannot and then save all of them as seperate .txt files. I will tell Claude then that I want to get a simple Python structure which will help me save the title, url and the cleaned text.
 
 Chunkiung: I will give claude my chunking strategy section and ask it to implement a chunking function.
+
+**Milestone 4 — Embedding and retrieval:**
 
 Embedding: I will tell claude that we will use the all-MiniLM-L6-v2 model via sentence-transformers
 
 Retreival: I will ask claude to see my retrieval approach section and see the tradeoff and also the top-k = 4.
 
+**Milestone 5 — Generation and interface:**
+
 Generation: I will ask claude to implement GrokAPI: llama-3.3-70b-versatile for the answer/output generation. I will also tell it to make sure to add citation to every answer and in any case when there is no answer, then just tell the user "The answer to your question is not in our database."
 
-**Milestone 3 — Ingestion and chunking:**
-
-**Milestone 4 — Embedding and retrieval:**
-
-**Milestone 5 — Generation and interface:**
+Interface: Make it a simple question box and answer box where user can enter question and answer can be generated and we can work on making the interface better later
