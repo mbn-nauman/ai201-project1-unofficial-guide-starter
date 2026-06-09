@@ -37,9 +37,9 @@ Haverford College incoming first-year survival guide. This information is genera
      A review-heavy corpus warrants different chunking than a long FAQ. -->
 
 **Chunk size:**
-1000 characters
+700 characters
 **Overlap:**
-200 characters
+100 characters
 **Reasoning:**
 As my documents include reddit comments, student reviews etc, I chose a chunk size of 1000 and overlap of 200 so that it is big enough to extract the student's experience and small enough to preserve the context. 
 
