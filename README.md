@@ -180,5 +180,10 @@ The initial chunk size was 1000 but after testing it, I realised that it needed 
 **Instance 2**
 
 - *What I gave the AI:*
+The gave Claude my generation requirements
+
 - *What it produced:*
+It produced a generate() function but the system prompt was placing [Source 1] [Source 2] etc labels before each context block and this caused the LLM to cite sources directly in the answers which I did not want.
+
 - *What I changed or overrode:*
+I asked Claude to remove the source labels and replace the "do not cite" instruction to system prompt with a GOOD/BAD example pattern. Also, Claude did not do this by itself but I later asked it to add a distance limit where if the top chunk's distance was more than 0.7, then the LLM never gets the chunks and the default answer for no answer in generated so the LLM does not hallucinate.
