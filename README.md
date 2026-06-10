@@ -139,54 +139,43 @@ The source attribution (or citations) are not left to the LLM to do. Instead, we
 
 ## Failure Case Analysis
 
-<!-- Identify at least one question where retrieval or generation did not work as expected.
-     Write a specific explanation of *why* it failed, tied to a part of the pipeline.
-
-     "The answer was wrong" is not an explanation.
-
-     "The relevant information was split across a chunk boundary, so retrieval returned
-     only half the context — the model didn't have enough to answer correctly" is an explanation.
-
-     "The embedding model treated the professor's nickname as out-of-vocabulary and returned
-     results from an unrelated review" is an explanation. -->
-
 **Question that failed:**
+How far are the apartments from Tritton Hall.
 
 **What the system returned:**
+The Haverford Apartments are located on the southernmost end of campus, but the exact distance from Tritton Hall isn't specified. I can tell you that Tritton is one of the freshman dorms, and it's likely not extremely far since campus isn't huge, but I don't have the exact distance.
 
 **Root cause (tied to a specific pipeline stage):**
+The root cause is the retreival process because the expecrted answer does exist in the documents. The issue is that the chunk where the answer would be was not retreived as one of the top-4 chunks. The top chunk with lowest distance is about floor plans, but it is top chunk most probably because it has the words "Tritton" and "apartments".
 
 **What you would change to fix it:**
+We can fix this by using paragraph chunking (recursive chunking), as then the information in one paragraph would stay intact and would not split over multiple chunks.
 
 ---
 
 ## Spec Reflection
 
-<!-- Reflect on how planning.md shaped your implementation.
-     Answer both questions with at least 2–3 sentences each. -->
-
 **One way the spec helped you during implementation:**
+Adding questions with their expected answers helped in implementation when I was testing retreival and different chunk sizes. While testing it, the expected answers gave a benchmark to judge whether the changes in chunk size made any difference in the accuracy.
 
 **One way your implementation diverged from the spec, and why:**
+Initially I decided to go with Gradio for the interface but then while implementing it, I realised that you cannot change some colors in Gradio so I decied to shift to Streamlit and that made it easier to change the colors and make a much better user interface. I spec too to show that Streamlit was used instead of Gradio
 
 ---
 
 ## AI Usage
 
-<!-- Describe at least 2 specific instances where you used an AI tool during this project.
-     For each: what did you give the AI as input, what did it produce, and what did you
-     change, override, or direct differently?
-
-     "I used Claude to help me code" is not sufficient.
-     "I gave Claude my Chunking Strategy section from planning.md and asked it to implement
-     chunk_text(). It returned a function using a fixed character split. I overrode the
-     chunk size from 500 to 200 because my documents are short reviews, not long guides." -->
-
 **Instance 1**
 
 - *What I gave the AI:*
+I gave Claude my Chunking Strategy from planning.md and asked it to implement it by making a chunking function.
+
 - *What it produced:*
+It produced a fixed character splitting function with an overlap for the chunks. It also produced a build_chunks() function to attach the metadata of each document to its relevant chunk.
+
 - *What I changed or overrode:*
+The initial chunk size was 1000 but after testing it, I realised that it needed to be changed due to high distance scored of the chunks. So I tried 300, 700, and 500, and ended up using 500 character chunks with a 100 character overlap.
+
 
 **Instance 2**
 
