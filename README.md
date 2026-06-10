@@ -148,7 +148,7 @@ Sources: [Customs Gave Me a Community: A First-Year Perspective](https://haverfo
 
 ---
 
-**Out-of-scope refusal — What is the GPA requirement to keep my scholarship?**
+**Out-of-scope refusal: What is the GPA requirement to keep my scholarship?**
 
 The answer to your question is not in our database.
 
